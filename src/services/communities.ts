@@ -78,5 +78,60 @@ export const communitiesService = {
       .eq('id', id)
 
     if (error) throw error
-  }
+  },
+
+  async getCommunityPlayers(communityId: string) {
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+    if (sessionError) throw sessionError
+    if (!session?.user) throw new Error('Usuário não autenticado')
+
+    const { data, error } = await supabase
+      .from('community_players')
+      .select(`
+        player:players (
+          id,
+          name,
+          nickname
+        )
+      `)
+      .eq('community_id', communityId)
+
+    if (error) throw error
+    return data.map((item) => item.player)
+  },
+
+  async addPlayerToCommunity(communityId: string, playerId: string) {
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+    if (sessionError) throw sessionError
+    if (!session?.user) throw new Error('Usuário não autenticado')
+
+    const { error } = await supabase
+      .from('community_players')
+      .insert({
+        community_id: communityId,
+        player_id: playerId,
+        created_by: session.user.id
+      })
+
+    if (error) {
+      if (error.code === '23505') {
+        throw new Error('Este jogador já está na comunidade')
+      }
+      throw error
+    }
+  },
+
+  async removePlayerFromCommunity(communityId: string, playerId: string) {
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+    if (sessionError) throw sessionError
+    if (!session?.user) throw new Error('Usuário não autenticado')
+
+    const { error } = await supabase
+      .from('community_players')
+      .delete()
+      .eq('community_id', communityId)
+      .eq('player_id', playerId)
+
+    if (error) throw error
+  },
 }
