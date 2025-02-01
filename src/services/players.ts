@@ -3,6 +3,7 @@ import { Database } from '@/types/supabase'
 
 type Player = Database['public']['Tables']['players']['Row']
 type PlayerInsert = Database['public']['Tables']['players']['Insert']
+type PlayerUpdate = Database['public']['Tables']['players']['Update']
 
 async function getAllPlayers() {
   const { data: user } = await supabase.auth.getUser()
@@ -38,7 +39,35 @@ async function createPlayer(player: Omit<PlayerInsert, 'created_by'>) {
   return data
 }
 
+async function updatePlayer(id: string, player: PlayerUpdate) {
+  const { data, error } = await supabase
+    .from('players')
+    .update(player)
+    .eq('id', id)
+    .select()
+    .single()
+
+  if (error) {
+    throw error
+  }
+
+  return data
+}
+
+async function deletePlayer(id: string) {
+  const { error } = await supabase
+    .from('players')
+    .delete()
+    .eq('id', id)
+
+  if (error) {
+    throw error
+  }
+}
+
 export const playersService = {
   getAllPlayers,
-  createPlayer
+  createPlayer,
+  updatePlayer,
+  deletePlayer
 }

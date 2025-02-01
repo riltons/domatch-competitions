@@ -10,6 +10,7 @@ import { NewCommunityPage } from '@/pages/NewCommunityPage'
 import { PlayersPage } from '@/pages/PlayersPage'
 import { AllPlayersPage } from '@/pages/AllPlayersPage'
 import { NewPlayerPage } from '@/pages/NewPlayerPage'
+import { EditPlayerPage } from '@/pages/EditPlayerPage'
 import { Toaster } from 'sonner'
 
 function PublicRoute({ children }: { children: React.ReactNode }) {
@@ -114,6 +115,14 @@ export function App() {
           element={
             <ProtectedRoute>
               <NewPlayerPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/players/:id/edit"
+          element={
+            <ProtectedRoute>
+              <EditPlayerPage />
             </ProtectedRoute>
           }
         />
