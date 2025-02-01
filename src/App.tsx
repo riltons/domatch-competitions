@@ -9,6 +9,8 @@ import { CommunitiesPage } from '@/pages/CommunitiesPage'
 import { NewCommunityPage } from '@/pages/NewCommunityPage'
 import { PlayersPage } from '@/pages/PlayersPage'
 import { AllPlayersPage } from '@/pages/AllPlayersPage'
+import { NewPlayerPage } from '@/pages/NewPlayerPage'
+import { Toaster } from 'sonner'
 
 function PublicRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth()
@@ -41,6 +43,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 export function App() {
   return (
     <BrowserRouter>
+      <Toaster richColors position="top-right" />
       <Routes>
         <Route
           path="/login"
@@ -103,6 +106,14 @@ export function App() {
           element={
             <ProtectedRoute>
               <AllPlayersPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/players/new"
+          element={
+            <ProtectedRoute>
+              <NewPlayerPage />
             </ProtectedRoute>
           }
         />

@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import { playersService } from '@/services/players'
 import { UserPlus } from 'lucide-react'
+import { Link } from 'react-router-dom'
 
 export function AllPlayersPage() {
   const { data: players, isLoading } = useQuery({
@@ -26,6 +27,14 @@ export function AllPlayersPage() {
             Veja todos os jogadores do sistema
           </p>
         </div>
+
+        {/* Botão Desktop */}
+        <Button asChild className="hidden md:flex">
+          <Link to="/players/new">
+            <UserPlus className="mr-2 h-4 w-4" />
+            Adicionar Jogador
+          </Link>
+        </Button>
       </div>
 
       <div className="grid gap-4">
@@ -59,6 +68,18 @@ export function AllPlayersPage() {
           </div>
         )}
       </div>
+
+      {/* FAB Mobile */}
+      <Button
+        asChild
+        size="icon"
+        className="fixed right-4 bottom-24 md:hidden shadow-lg"
+      >
+        <Link to="/players/new">
+          <UserPlus className="h-4 w-4" />
+          <span className="sr-only">Adicionar Jogador</span>
+        </Link>
+      </Button>
     </div>
   )
 }
