@@ -1,128 +1,167 @@
+import { useState } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '@/features/auth/AuthProvider'
 import { Button } from '@/components/ui/button'
-import { Link } from 'react-router-dom'
-import { authService } from '@/services/auth'
-import { useNavigate } from 'react-router-dom'
-import { Menu, X } from 'lucide-react'
-import { useState } from 'react'
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
+import { Menu, Home, Users, User, Trophy } from 'lucide-react'
 import { Logo } from '@/components/ui/logo'
-import { BottomNav } from '@/components/ui/bottom-nav'
 
 export function MainLayout({ children }: { children: React.ReactNode }) {
-  const { user, loading } = useAuth()
-  const navigate = useNavigate()
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(false)
+  const { user } = useAuth()
+  const location = useLocation()
 
-  const handleLogout = async () => {
-    try {
-      await authService.logout()
-      navigate('/login')
-    } catch (error) {
-      console.error('Erro ao fazer logout:', error)
+  const menuItems = [
+    {
+      href: '/',
+      label: 'Início',
+      icon: Home
+    },
+    {
+      href: '/communities',
+      label: 'Comunidades',
+      icon: Users
+    },
+    {
+      href: '/players',
+      label: 'Jogadores',
+      icon: Trophy
+    },
+    {
+      href: '/profile',
+      label: 'Perfil',
+      icon: User
     }
+  ]
+
+  const isActive = (href: string) => {
+    if (href === '/') {
+      return location.pathname === '/'
+    }
+    return location.pathname.startsWith(href)
   }
 
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen)
+  if (!user) {
+    return children
+  }
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Header */}
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <nav className="container mx-auto px-4 h-16">
-          <div className="flex h-full items-center justify-between">
-            <Link to="/" className="flex items-center space-x-2">
+        <div className="px-2 md:container flex h-14 items-center justify-between md:justify-start">
+          {/* Menu Mobile e Logo */}
+          <div className="flex items-center gap-2">
+            <Sheet open={isOpen} onOpenChange={setIsOpen}>
+              <SheetTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="md:hidden"
+                >
+                  <Menu className="h-5 w-5" />
+                  <span className="sr-only">Toggle Menu</span>
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="p-0">
+                <nav className="flex flex-col gap-4 p-4">
+                  {menuItems.map((item) => {
+                    const Icon = item.icon
+                    return (
+                      <Link
+                        key={item.href}
+                        to={item.href}
+                        onClick={() => setIsOpen(false)}
+                        className={`flex items-center gap-2 text-sm font-medium ${
+                          isActive(item.href)
+                            ? 'text-foreground'
+                            : 'text-muted-foreground'
+                        }`}
+                      >
+                        <Icon className="h-4 w-4" />
+                        {item.label}
+                      </Link>
+                    )
+                  })}
+                </nav>
+              </SheetContent>
+            </Sheet>
+
+            <Link to="/" className="flex items-center gap-2">
               <Logo className="w-8 h-8" />
               <span className="text-xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
                 Domatch
               </span>
             </Link>
-
-            {/* Menu para Desktop */}
-            {!loading && (
-              <div className="hidden md:flex items-center gap-4">
-                {user ? (
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-muted-foreground">Olá, {user.email}</span>
-                    <Button variant="ghost" asChild>
-                      <Link to="/communities">Comunidades</Link>
-                    </Button>
-                    <Button variant="ghost" asChild>
-                      <Link to="/profile">Perfil</Link>
-                    </Button>
-                    <Button variant="outline" onClick={handleLogout}>
-                      Sair
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="flex gap-2">
-                    <Button asChild variant="ghost">
-                      <Link to="/login">Entrar</Link>
-                    </Button>
-                    <Button asChild variant="default">
-                      <Link to="/register">Criar Conta</Link>
-                    </Button>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Botão do Menu Mobile */}
-            <button
-              className="md:hidden p-2 rounded-md hover:bg-accent"
-              onClick={toggleMenu}
-              aria-label="Toggle menu"
-            >
-              {isMenuOpen ? (
-                <X className="h-6 w-6" />
-              ) : (
-                <Menu className="h-6 w-6" />
-              )}
-            </button>
           </div>
 
-          {/* Menu Mobile */}
-          {isMenuOpen && !loading && (
-            <div className="md:hidden absolute top-16 left-0 right-0 border-b bg-background shadow-lg">
-              <div className="container mx-auto px-4 py-4 flex flex-col gap-2">
-                {user ? (
-                  <>
-                    <span className="text-sm text-muted-foreground">Olá, {user.email}</span>
-                    <Button variant="ghost" asChild className="justify-start">
-                      <Link to="/communities">Comunidades</Link>
-                    </Button>
-                    <Button variant="ghost" asChild className="justify-start">
-                      <Link to="/profile">Perfil</Link>
-                    </Button>
-                    <Button variant="outline" onClick={handleLogout} className="justify-start">
-                      Sair
-                    </Button>
-                  </>
-                ) : (
-                  <>
-                    <Button asChild variant="ghost" className="justify-start">
-                      <Link to="/login">Entrar</Link>
-                    </Button>
-                    <Button asChild variant="default" className="justify-start">
-                      <Link to="/register">Criar Conta</Link>
-                    </Button>
-                  </>
-                )}
-              </div>
-            </div>
-          )}
-        </nav>
+          {/* Desktop Menu */}
+          <nav className="hidden md:flex md:flex-1 md:justify-center">
+            <ul className="flex gap-4">
+              {menuItems.map((item) => {
+                const Icon = item.icon
+                return (
+                  <li key={item.href}>
+                    <Link
+                      to={item.href}
+                      className={`flex items-center gap-2 px-4 py-2 text-sm font-medium ${
+                        isActive(item.href)
+                          ? 'text-foreground'
+                          : 'text-muted-foreground hover:text-foreground'
+                      }`}
+                    >
+                      <Icon className="h-4 w-4" />
+                      {item.label}
+                    </Link>
+                  </li>
+                )
+              })}
+            </ul>
+          </nav>
+
+          {/* Profile Button */}
+          <div className="flex items-center">
+            <Button
+              variant="ghost"
+              size="icon"
+              asChild
+              className="ml-auto"
+            >
+              <Link to="/profile">
+                <User className="h-5 w-5" />
+                <span className="sr-only">Profile</span>
+              </Link>
+            </Button>
+          </div>
+        </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8">
-        {children}
-      </main>
+      {/* Main Content */}
+      <main className="px-2 md:container py-6 pb-24 md:pb-6">{children}</main>
 
-      <footer className="border-t">
-        <div className="container mx-auto px-4 py-6 text-center text-sm text-muted-foreground">
-          {new Date().getFullYear()} Domatch. Todos os direitos reservados.
-        </div>
-      </footer>
-
-      <BottomNav />
+      {/* Mobile Bottom Navigation */}
+      <nav className="fixed bottom-0 left-0 right-0 z-50 border-t bg-background md:hidden">
+        <ul className="px-2 md:container flex h-16 items-center justify-around">
+          {menuItems.map((item) => {
+            const Icon = item.icon
+            return (
+              <li key={item.href}>
+                <Link
+                  to={item.href}
+                  className={`flex flex-col items-center gap-1 px-4 py-2 text-xs font-medium ${
+                    isActive(item.href)
+                      ? 'text-foreground'
+                      : 'text-muted-foreground'
+                  }`}
+                >
+                  <Icon className="h-5 w-5" />
+                  {item.label}
+                </Link>
+              </li>
+            )
+          })}
+        </ul>
+      </nav>
     </div>
   )
 }
