@@ -1,56 +1,87 @@
-import { useState } from 'react'
-import { supabase } from './lib/supabase'
-import { AuthProvider } from './features/auth/AuthProvider'
-import { LoginForm } from './features/auth/LoginForm'
-import { useAuth } from './features/auth/AuthProvider'
-import { CommunityList } from './features/communities/CommunityList'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { AuthProvider, useAuth } from '@/features/auth/AuthProvider'
+import { MainLayout } from '@/components/layouts/MainLayout'
+import { HomePage } from '@/pages/HomePage'
+import { ProfilePage } from '@/pages/ProfilePage'
+import { LoginPage } from '@/features/auth/LoginPage'
+import { RegisterPage } from '@/features/auth/RegisterPage'
+import { CommunityList } from '@/features/communities/CommunityList'
 
-function AppContent() {
+const queryClient = new QueryClient()
+
+function PrivateRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth()
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div>Carregando...</div>
-      </div>
-    )
+    return null
   }
 
   if (!user) {
-    return <LoginForm />
+    return <Navigate to="/login" />
   }
 
-  return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold">Competições de Dominó</h1>
-          <div className="text-sm">
-            Olá, {user.nome}
-          </div>
-        </div>
-      </header>
-
-      <main className="container mx-auto px-4 py-8">
-        <div className="grid gap-6">
-          <CommunityList />
-          
-          <section>
-            <h2 className="text-xl font-semibold mb-4">Competições Ativas</h2>
-            {/* Lista de competições será implementada aqui */}
-          </section>
-        </div>
-      </main>
-    </div>
-  )
+  return children
 }
 
-function App() {
-  return (
-    <AuthProvider>
-      <AppContent />
-    </AuthProvider>
-  )
+function PublicRoute({ children }: { children: React.ReactNode }) {
+  const { user, loading } = useAuth()
+
+  if (loading) {
+    return null
+  }
+
+  if (user) {
+    return <Navigate to="/" />
+  }
+
+  return children
 }
 
-export default App
+export function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <Router>
+          <MainLayout>
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route
+                path="/login"
+                element={
+                  <PublicRoute>
+                    <LoginPage />
+                  </PublicRoute>
+                }
+              />
+              <Route
+                path="/register"
+                element={
+                  <PublicRoute>
+                    <RegisterPage />
+                  </PublicRoute>
+                }
+              />
+              <Route
+                path="/profile"
+                element={
+                  <PrivateRoute>
+                    <ProfilePage />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/communities"
+                element={
+                  <PrivateRoute>
+                    <CommunityList />
+                  </PrivateRoute>
+                }
+              />
+            </Routes>
+          </MainLayout>
+        </Router>
+      </AuthProvider>
+    </QueryClientProvider>
+  )
+}

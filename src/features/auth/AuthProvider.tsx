@@ -1,93 +1,48 @@
 import { createContext, useContext, useEffect, useState } from 'react'
-import { supabase } from '../../lib/supabase'
-import type { Usuario } from '../../types'
+import { User } from '@supabase/supabase-js'
+import { supabase } from '@/lib/supabase'
 
 interface AuthContextType {
-  user: Usuario | null
+  user: User | null
   loading: boolean
-  signIn: (email: string, password: string) => Promise<void>
-  signOut: () => Promise<void>
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined)
+const AuthContext = createContext<AuthContextType>({
+  user: null,
+  loading: true,
+})
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<Usuario | null>(null)
+  const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     // Verificar sessão atual
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) {
-        // Buscar dados adicionais do usuário
-        supabase
-          .from('usuarios')
-          .select('*')
-          .eq('id', session.user.id)
-          .single()
-          .then(({ data }) => {
-            if (data) {
-              setUser(data as Usuario)
-            }
-          })
-      }
+      setUser(session?.user ?? null)
       setLoading(false)
     })
 
-    // Escutar mudanças na autenticação
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (session?.user) {
-          const { data } = await supabase
-            .from('usuarios')
-            .select('*')
-            .eq('id', session.user.id)
-            .single()
-          
-          if (data) {
-            setUser(data as Usuario)
-          }
-        } else {
-          setUser(null)
-        }
-        setLoading(false)
-      }
-    )
-
-    return () => {
-      subscription.unsubscribe()
-    }
-  }, [])
-
-  const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
+    // Escutar mudanças de autenticação
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null)
     })
 
-    if (error) {
-      throw error
-    }
-  }
-
-  const signOut = async () => {
-    const { error } = await supabase.auth.signOut()
-    if (error) {
-      throw error
-    }
-    setUser(null)
-  }
+    return () => subscription.unsubscribe()
+  }, [])
 
   return (
-    <AuthContext.Provider value={{ user, loading, signIn, signOut }}>
+    <AuthContext.Provider value={{ user, loading }}>
       {children}
     </AuthContext.Provider>
   )
 }
 
-export const useAuth = () => {
+export function useAuth() {
   const context = useContext(AuthContext)
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useAuth deve ser usado dentro de um AuthProvider')
   }
   return context
