@@ -1,7 +1,8 @@
-@import 'tailwindcss/base';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 @import './theme.css';
-@import 'tailwindcss/components';
-@import 'tailwindcss/utilities';
 
 @layer base {
   :root {

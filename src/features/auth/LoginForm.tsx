@@ -2,16 +2,16 @@ import { useState } from 'react'
 import { useAuth } from './AuthProvider'
 
 export function LoginForm() {
-  const { signIn } = useAuth()
+  const { signIn, signInWithGoogle } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
-    setLoading(true)
+    setIsLoading(true)
 
     try {
       await signIn(email, password)
@@ -19,7 +19,7 @@ export function LoginForm() {
       setError('Erro ao fazer login. Verifique suas credenciais.')
       console.error(err)
     } finally {
-      setLoading(false)
+      setIsLoading(false)
     }
   }
 
@@ -62,13 +62,25 @@ export function LoginForm() {
           />
         </div>
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-primary text-primary-foreground py-2 px-4 rounded-md hover:bg-primary/90 disabled:opacity-50"
-        >
-          {loading ? 'Entrando...' : 'Entrar'}
-        </button>
+        <div className="flex flex-col gap-2">
+          <Button
+            type="submit"
+            className="w-full"
+            disabled={isLoading}
+          >
+            {isLoading ? 'Entrando...' : 'Entrar'}
+          </Button>
+          <Button
+            type="button"
+            variant="secondary"
+            className="w-full"
+            onClick={() => signInWithGoogle()}
+            disabled={isLoading}
+          >
+            <img src="/google.svg" alt="Google" className="w-5 h-5 mr-2" />
+            Entrar com Google
+          </Button>
+        </div>
       </form>
     </div>
   )

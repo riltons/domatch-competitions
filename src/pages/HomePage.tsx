@@ -24,25 +24,25 @@ export function HomePage() {
 
             {user ? (
               <div className="grid gap-4 max-w-md mx-auto">
-                <Button asChild size="lg" className="group">
+                <Button asChild size="lg" className="bg-[#22c55e] hover:bg-[#16a34a] text-white group">
                   <Link to="/communities" className="flex items-center justify-center">
                     Ver Minhas Comunidades
                     <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </Link>
                 </Button>
-                <Button asChild variant="secondary" size="lg">
+                <Button asChild variant="secondary" size="lg" className="border-[#22c55e] text-[#22c55e] hover:bg-[#22c55e]/10">
                   <Link to="/communities/new">Criar Nova Comunidade</Link>
                 </Button>
               </div>
             ) : (
               <div className="grid gap-4 max-w-md mx-auto">
-                <Button asChild size="lg" className="group">
+                <Button asChild size="lg" className="bg-[#22c55e] hover:bg-[#16a34a] text-white group">
                   <Link to="/register" className="flex items-center justify-center">
                     Criar uma Conta
                     <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </Link>
                 </Button>
-                <Button asChild variant="secondary" size="lg">
+                <Button asChild variant="secondary" size="lg" className="border-[#22c55e] text-[#22c55e] hover:bg-[#22c55e]/10">
                   <Link to="/login">Fazer Login</Link>
                 </Button>
               </div>

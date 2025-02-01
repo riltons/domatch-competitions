@@ -6,7 +6,8 @@ import { HomePage } from '@/pages/HomePage'
 import { ProfilePage } from '@/pages/ProfilePage'
 import { LoginPage } from '@/features/auth/LoginPage'
 import { RegisterPage } from '@/features/auth/RegisterPage'
-import { CommunityList } from '@/features/communities/CommunityList'
+import { CommunitiesPage } from '@/pages/CommunitiesPage'
+import { NewCommunityPage } from '@/pages/NewCommunityPage'
 
 const queryClient = new QueryClient()
 
@@ -74,7 +75,15 @@ export function App() {
                 path="/communities"
                 element={
                   <PrivateRoute>
-                    <CommunityList />
+                    <CommunitiesPage />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/communities/new"
+                element={
+                  <PrivateRoute>
+                    <NewCommunityPage />
                   </PrivateRoute>
                 }
               />
