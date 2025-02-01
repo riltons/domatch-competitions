@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { Link } from 'react-router-dom'
 import { Plus } from 'lucide-react'
+import { Fab } from '@/components/ui/fab'
 
 export function CommunitiesPage() {
   return (
@@ -12,7 +13,7 @@ export function CommunitiesPage() {
             Gerencie suas comunidades e jogadores
           </p>
         </div>
-        <Button asChild className="bg-[#22c55e] hover:bg-[#16a34a] text-white">
+        <Button asChild className="bg-[#22c55e] hover:bg-[#16a34a] text-white hidden md:flex">
           <Link to="/communities/new" className="flex items-center">
             <Plus className="mr-2 h-4 w-4" />
             Nova Comunidade
@@ -25,9 +26,11 @@ export function CommunitiesPage() {
         <div className="text-center py-8 text-muted-foreground">
           Você ainda não tem nenhuma comunidade.
           <br />
-          Clique no botão acima para criar sua primeira comunidade.
+          Clique no botão para criar sua primeira comunidade.
         </div>
       </div>
+
+      <Fab href="/communities/new" label="Nova Comunidade" />
     </div>
   )
 }

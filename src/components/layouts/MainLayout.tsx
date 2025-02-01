@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom'
 import { Menu, X } from 'lucide-react'
 import { useState } from 'react'
 import { Logo } from '@/components/ui/logo'
+import { BottomNav } from '@/components/ui/bottom-nav'
 
 export function MainLayout({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth()
@@ -120,6 +121,8 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
           {new Date().getFullYear()} Domatch. Todos os direitos reservados.
         </div>
       </footer>
+
+      <BottomNav />
     </div>
   )
 }
