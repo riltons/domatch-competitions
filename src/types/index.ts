@@ -1,3 +1,27 @@
+import { Database } from './supabase'
+
+export type Community = Database['public']['Tables']['communities']['Row']
+export type Competition = Database['public']['Tables']['competitions']['Row']
+
+export interface CreateCommunityDTO {
+  name: string
+}
+
+export interface CreateCompetitionDTO {
+  name: string
+  startDate: Date
+  endDate: Date
+  communityId: string
+}
+
+export interface UpdateCommunityDTO extends Partial<CreateCommunityDTO> {
+  id: string
+}
+
+export interface UpdateCompetitionDTO extends Partial<CreateCompetitionDTO> {
+  id: string
+}
+
 export interface Usuario {
   id: string
   email: string
