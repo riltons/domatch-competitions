@@ -120,7 +120,10 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
           </nav>
 
           {/* Profile Button */}
-          <div className="flex items-center">
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground hidden md:inline-block">
+              {user.user_metadata.name || user.email}
+            </span>
             <Button
               variant="ghost"
               size="icon"

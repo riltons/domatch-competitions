@@ -35,40 +35,78 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     return <Navigate to="/login" />
   }
 
-  return children
+  return <MainLayout>{children}</MainLayout>
 }
 
 export function App() {
   return (
     <BrowserRouter>
-      <MainLayout>
-        <Routes>
-          <Route
-            path="/login"
-            element={
-              <PublicRoute>
-                <LoginPage />
-              </PublicRoute>
-            }
-          />
-          <Route
-            path="/register"
-            element={
-              <PublicRoute>
-                <RegisterPage />
-              </PublicRoute>
-            }
-          />
-          <Route element={<ProtectedRoute />}>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/communities" element={<CommunitiesPage />} />
-            <Route path="/communities/new" element={<NewCommunityPage />} />
-            <Route path="/communities/:communityId/players" element={<PlayersPage />} />
-            <Route path="/players" element={<AllPlayersPage />} />
-            <Route path="/profile" element={<ProfilePage />} />
-          </Route>
-        </Routes>
-      </MainLayout>
+      <Routes>
+        <Route
+          path="/login"
+          element={
+            <PublicRoute>
+              <LoginPage />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/register"
+          element={
+            <PublicRoute>
+              <RegisterPage />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <HomePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <ProfilePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/communities"
+          element={
+            <ProtectedRoute>
+              <CommunitiesPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/communities/new"
+          element={
+            <ProtectedRoute>
+              <NewCommunityPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/communities/:id/players"
+          element={
+            <ProtectedRoute>
+              <PlayersPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/players"
+          element={
+            <ProtectedRoute>
+              <AllPlayersPage />
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
     </BrowserRouter>
   )
 }
