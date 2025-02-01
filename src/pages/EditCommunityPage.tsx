@@ -1,44 +1,44 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useNavigate, useParams, Link } from 'react-router-dom'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { ArrowLeft } from 'lucide-react'
-import { Link } from 'react-router-dom'
 import { communitiesService } from '@/services/communities'
 import { toast } from 'sonner'
-import { useAuth } from '@/features/auth/AuthProvider'
 
-export function NewCommunityPage() {
+export function EditCommunityPage() {
+  const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
-  const { user, loading } = useAuth()
-  const [name, setName] = useState('')
-  const [description, setDescription] = useState('')
+  
+  const { data: community, isLoading: isLoadingCommunity } = useQuery({
+    queryKey: ['communities', id],
+    queryFn: () => communitiesService.getCommunity(id!)
+  })
 
-  const { mutate: createCommunity, isPending } = useMutation({
-    mutationFn: async () => {
-      if (!user) throw new Error('Usuário não autenticado')
-      return communitiesService.createCommunity({
-        name,
-        description: description || null,
-        active: true
-      })
-    },
+  const [name, setName] = useState(community?.name ?? '')
+  const [description, setDescription] = useState(community?.description ?? '')
+
+  const { mutate: updateCommunity, isPending } = useMutation({
+    mutationFn: () => communitiesService.updateCommunity(id!, {
+      name,
+      description: description || null
+    }),
     onSuccess: () => {
-      toast.success('Comunidade criada com sucesso!')
+      toast.success('Comunidade atualizada com sucesso!')
       queryClient.invalidateQueries({ queryKey: ['communities'] })
       navigate('/communities')
     },
     onError: (error) => {
-      console.error('Erro ao criar comunidade:', error)
+      console.error('Erro ao atualizar comunidade:', error)
       if (error instanceof Error && error.message === 'Usuário não autenticado') {
-        toast.error('Você precisa estar logado para criar uma comunidade')
+        toast.error('Você precisa estar logado para atualizar uma comunidade')
         navigate('/login')
       } else {
-        toast.error('Erro ao criar comunidade. Por favor, tente novamente.')
+        toast.error('Erro ao atualizar comunidade. Por favor, tente novamente.')
       }
     }
   })
@@ -49,11 +49,26 @@ export function NewCommunityPage() {
       toast.error('O nome da comunidade é obrigatório')
       return
     }
-    createCommunity()
+    updateCommunity()
   }
 
-  if (loading) {
-    return <div>Carregando...</div>
+  if (isLoadingCommunity) {
+    return (
+      <div className="flex items-center justify-center h-32">
+        <p className="text-muted-foreground">Carregando comunidade...</p>
+      </div>
+    )
+  }
+
+  if (!community) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-muted-foreground">Comunidade não encontrada</p>
+        <Button asChild variant="link" className="mt-2">
+          <Link to="/communities">Voltar para Comunidades</Link>
+        </Button>
+      </div>
+    )
   }
 
   return (
@@ -71,9 +86,9 @@ export function NewCommunityPage() {
           </Link>
         </Button>
 
-        <h2 className="text-3xl font-bold tracking-tight">Nova Comunidade</h2>
+        <h2 className="text-3xl font-bold tracking-tight">Editar Comunidade</h2>
         <p className="text-muted-foreground">
-          Crie uma nova comunidade para gerenciar seus jogadores e campeonatos
+          Atualize as informações da sua comunidade
         </p>
       </div>
 
@@ -104,7 +119,7 @@ export function NewCommunityPage() {
             type="submit"
             disabled={isPending}
           >
-            {isPending ? 'Criando...' : 'Criar Comunidade'}
+            {isPending ? 'Salvando...' : 'Salvar Alterações'}
           </Button>
           
           <Button

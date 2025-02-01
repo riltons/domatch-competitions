@@ -4,7 +4,8 @@ import { useQuery } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import { communitiesService } from '@/services/communities'
 import { Fab } from '@/components/ui/fab'
-import { Users, UserPlus, Trophy } from 'lucide-react'
+import { Users } from 'lucide-react'
+import { CommunityCard } from '@/components/ui/community-card'
 
 export function CommunitiesPage() {
   const { data: communities, isLoading } = useQuery({
@@ -50,49 +51,7 @@ export function CommunitiesPage() {
         ) : (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {communities?.map((community) => (
-              <div
-                key={community.id}
-                className="p-4 rounded-lg border border-border bg-card text-card-foreground"
-              >
-                <div className="flex items-start justify-between">
-                  <div>
-                    <h3 className="font-semibold">{community.name}</h3>
-                    {community.description && (
-                      <p className="text-sm text-muted-foreground">
-                        {community.description}
-                      </p>
-                    )}
-                  </div>
-                  <Button variant="ghost" size="icon" className="h-8 w-8">
-                    <span className="sr-only">Opções</span>
-                    <i className="fas fa-ellipsis-v" />
-                  </Button>
-                </div>
-                <div className="mt-4 flex gap-2">
-                  <Button
-                    asChild
-                    variant="outline"
-                    size="sm"
-                    className="flex-1"
-                  >
-                    <Link to={`/communities/${community.id}/players`}>
-                      <UserPlus className="mr-2 h-4 w-4" />
-                      Jogadores
-                    </Link>
-                  </Button>
-                  <Button
-                    asChild
-                    variant="outline"
-                    size="sm"
-                    className="flex-1"
-                  >
-                    <Link to={`/communities/${community.id}/competitions`}>
-                      <Trophy className="mr-2 h-4 w-4" />
-                      Competições
-                    </Link>
-                  </Button>
-                </div>
-              </div>
+              <CommunityCard key={community.id} community={community} />
             ))}
           </div>
         )}
