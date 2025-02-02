@@ -11,6 +11,7 @@ export function RegisterPage() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [phone, setPhone] = useState('')
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 
@@ -20,7 +21,7 @@ export function RegisterPage() {
     setIsLoading(true)
 
     try {
-      await signUp(email, password, name)
+      await signUp(email, password, name, phone)
       navigate('/communities')
     } catch (err) {
       setError('Erro ao criar conta. Tente novamente.')
@@ -53,6 +54,18 @@ export function RegisterPage() {
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
+            required
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="phone">Celular</Label>
+          <Input
+            id="phone"
+            type="tel"
+            placeholder="(99) 99999-9999"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
             required
           />
         </div>

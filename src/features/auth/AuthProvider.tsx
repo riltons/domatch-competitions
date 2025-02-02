@@ -6,12 +6,18 @@ interface AuthContextType {
   user: User | null
   loading: boolean
   refreshUser: () => Promise<void>
+  signUp: (email: string, password: string, name: string, phone: string) => Promise<void>
+  signIn: (email: string, password: string) => Promise<void>
+  signOut: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
   refreshUser: async () => {},
+  signUp: async () => {},
+  signIn: async () => {},
+  signOut: async () => {},
 })
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -29,6 +35,48 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  const signUp = async (email: string, password: string, name: string, phone: string) => {
+    const { data: { user }, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          name,
+        },
+      },
+    })
+
+    if (error) throw error
+
+    if (user) {
+      // Atualiza o perfil do usuário com o nome e telefone
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .upsert({
+          id: user.id,
+          name,
+          phone,
+          updated_at: new Date().toISOString(),
+        })
+
+      if (profileError) throw profileError
+    }
+  }
+
+  const signIn = async (email: string, password: string) => {
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    })
+
+    if (error) throw error
+  }
+
+  const signOut = async () => {
+    const { error } = await supabase.auth.signOut()
+    if (error) throw error
+  }
+
   useEffect(() => {
     // Verificar sessão atual
     refreshUser().finally(() => setLoading(false))
@@ -44,7 +92,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   return (
-    <AuthContext.Provider value={{ user, loading, refreshUser }}>
+    <AuthContext.Provider value={{ user, loading, refreshUser, signUp, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   )

@@ -23,7 +23,7 @@ export const communitiesService = {
     return data
   },
 
-  async createCommunity(input: Omit<CommunityInsert, 'created_by'>) {
+  async createCommunity(input: Omit<CommunityInsert, 'created_by' | 'admin_id'>) {
     try {
       const { data: { session }, error: sessionError } = await supabase.auth.getSession()
       if (sessionError) throw sessionError
@@ -31,7 +31,11 @@ export const communitiesService = {
 
       const { data: community, error } = await supabase
         .from('communities')
-        .insert({ ...input, created_by: session.user.id })
+        .insert({ 
+          ...input, 
+          created_by: session.user.id,
+          admin_id: session.user.id 
+        })
         .select()
         .single();
 

@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { ArrowLeft } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { communitiesService } from '@/services/communities'
+import { whatsappService } from '@/services/whatsapp'
 import { toast } from 'sonner'
 import { useAuth } from '@/features/auth/AuthProvider'
 
@@ -17,15 +18,31 @@ export function NewCommunityPage() {
   const { user, loading } = useAuth()
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
+  const [adminPhone, setAdminPhone] = useState('')
+  const [qrCode, setQrCode] = useState<string | null>(null)
 
-  const { mutate: createCommunity, isPending } = useMutation({
+  const { mutate: createCommunity, isPending, error } = useMutation({
     mutationFn: async () => {
       if (!user) throw new Error('Usuário não autenticado')
-      return communitiesService.createCommunity({
-        name,
-        description: description || null,
-        active: true
-      })
+      try {
+        // Primeiro verifica o status do WhatsApp
+        const status = await whatsappService.getStatus();
+        if (!status.isReady && status.qrCode) {
+          setQrCode(status.qrCode);
+          throw new Error('WhatsApp não está conectado. Por favor, escaneie o QR code.');
+        }
+
+        // Se o WhatsApp estiver conectado, cria a comunidade
+        return await communitiesService.createCommunity({
+          name,
+          description: description || null,
+          active: true,
+          admin_phone: adminPhone
+        })
+      } catch (error) {
+        console.error('Erro ao criar comunidade:', error)
+        throw error
+      }
     },
     onSuccess: () => {
       toast.success('Comunidade criada com sucesso!')
@@ -47,6 +64,14 @@ export function NewCommunityPage() {
     e.preventDefault()
     if (!name.trim()) {
       toast.error('O nome da comunidade é obrigatório')
+      return
+    }
+    if (!adminPhone.trim()) {
+      toast.error('O telefone do administrador é obrigatório')
+      return
+    }
+    if (!adminPhone.match(/^\+?[1-9]\d{10,14}$/)) {
+      toast.error('O telefone deve estar no formato internacional (ex: +5511999999999)')
       return
     }
     createCommunity()
@@ -77,6 +102,19 @@ export function NewCommunityPage() {
         </p>
       </div>
 
+      {error && (
+        <div className="mb-4">
+          <p className="text-sm text-red-500">{(error as Error).message}</p>
+        </div>
+      )}
+
+      {qrCode && (
+        <div className="mb-4 text-center">
+          <p className="text-sm">Escaneie o QR code abaixo para conectar o WhatsApp:</p>
+          <img src={qrCode} alt="WhatsApp QR Code" style={{ maxWidth: '100%' }} />
+        </div>
+      )}
+
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="name">Nome da Comunidade *</Label>
@@ -87,6 +125,20 @@ export function NewCommunityPage() {
             placeholder="Digite o nome da sua comunidade"
             required
           />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="adminPhone">Telefone do Administrador *</Label>
+          <Input
+            id="adminPhone"
+            value={adminPhone}
+            onChange={(e) => setAdminPhone(e.target.value)}
+            placeholder="+5511999999999"
+            required
+          />
+          <p className="text-sm text-gray-500 mt-1">
+            Digite o número no formato internacional (ex: +5511999999999)
+          </p>
         </div>
 
         <div className="space-y-2">

@@ -1,0 +1,10 @@
+{
+  "name": "supabase-migrations",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "node-fetch": "^3.3.0",
+    "pg": "^8.11.3"
+  }
+}
