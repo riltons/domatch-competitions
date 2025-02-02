@@ -1,19 +1,8 @@
 version: '3.8'
 
 services:
-  evolution-api:
-    image: atendeti/evolution-api:latest
-    container_name: evolution-api
-    restart: always
-    ports:
-      - "8080:8080"
-    volumes:
-      - evolution-api:/evolution/instances
-    networks:
-      - app-network
-
   n8n:
-    image: n8n/n8n:latest
+    image: n8nio/n8n:latest
     container_name: n8n
     restart: always
     ports:
@@ -34,5 +23,4 @@ networks:
     driver: bridge
 
 volumes:
-  evolution-api:
   n8n_data:
