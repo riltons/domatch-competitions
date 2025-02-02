@@ -25,9 +25,13 @@ export const communitiesService = {
 
   async createCommunity(input: Omit<CommunityInsert, 'created_by'>) {
     try {
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+      if (sessionError) throw sessionError
+      if (!session?.user) throw new Error('Usuário não autenticado')
+
       const { data: community, error } = await supabase
         .from('communities')
-        .insert({ ...input, created_by: supabase.auth.user()?.id })
+        .insert({ ...input, created_by: session.user.id })
         .select()
         .single();
 
@@ -111,6 +115,10 @@ export const communitiesService = {
 
   async addPlayerToCommunity(communityId: string, playerId: string) {
     try {
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+      if (sessionError) throw sessionError
+      if (!session?.user) throw new Error('Usuário não autenticado')
+
       // Buscar dados da comunidade e do jogador
       const [{ data: community }, { data: player }] = await Promise.all([
         supabase
@@ -137,7 +145,7 @@ export const communitiesService = {
           player_id: playerId,
           invitation_status: 'pending',
           player_phone: player.phone,
-          created_by: supabase.auth.user()?.id
+          created_by: session.user.id
         });
 
       if (error) {

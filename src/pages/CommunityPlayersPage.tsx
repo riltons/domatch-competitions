@@ -261,11 +261,15 @@ export function CommunityPlayersPage() {
               className="h-14 w-14 rounded-full bg-[#22c55e] hover:bg-[#16a34a] text-white shadow-lg"
             >
               <UserPlus className="h-6 w-6" />
+              <span className="sr-only">Adicionar jogador</span>
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent aria-describedby="dialog-description">
             <DialogHeader>
-              <DialogTitle>Adicionar Jogador à Comunidade</DialogTitle>
+              <DialogTitle>Adicionar Jogador</DialogTitle>
+              <p id="dialog-description" className="text-sm text-muted-foreground">
+                Selecione os jogadores que deseja adicionar à comunidade.
+              </p>
             </DialogHeader>
             <div className="space-y-4">
               {isLoadingAvailablePlayers ? (

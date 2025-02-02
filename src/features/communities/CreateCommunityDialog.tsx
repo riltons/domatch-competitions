@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Plus } from '@/components/ui/icons'
 import { communityService } from '@/services/community'
 import { createCommunitySchema, type CreateCommunityInput } from '@/lib/validations/community'
 
@@ -34,11 +35,17 @@ export function CreateCommunityDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>Nova Comunidade</Button>
+        <Button>
+          <Plus className="mr-2 h-4 w-4" />
+          Nova Comunidade
+        </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent aria-describedby="community-dialog-description">
         <DialogHeader>
-          <DialogTitle>Criar Nova Comunidade</DialogTitle>
+          <DialogTitle>Nova Comunidade</DialogTitle>
+          <p id="community-dialog-description" className="text-sm text-muted-foreground">
+            Preencha as informações para criar uma nova comunidade.
+          </p>
         </DialogHeader>
         <form onSubmit={handleSubmit((data) => createCommunity(data))} className="space-y-4">
           <div>
