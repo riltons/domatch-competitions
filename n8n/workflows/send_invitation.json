@@ -1,0 +1,68 @@
+{
+  "name": "Enviar Convite WhatsApp",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "webhook/community_players",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "url": "=https://qaslqmnbsgugvnmbtabg.supabase.co/rest/v1/communities?id=eq.{{ $json.community_id }}",
+        "method": "GET",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $env.SUPABASE_ANON_KEY }}"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $env.SUPABASE_ANON_KEY }}"
+            }
+          ]
+        }
+      },
+      "name": "Buscar Comunidade",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "url": "=http://evolution-api:8080/message/send/text",
+        "method": "POST",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $env.EVOLUTION_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "={{ $json.player_phone }}"
+            },
+            {
+              "name": "text",
+              "value": "=Olá! Você foi convidado para participar da comunidade {{ $json.name }}. Clique no link para entrar no grupo de WhatsApp: {{ $json.whatsapp_group_id }}"
+            }
+          ]
+        }
+      },
+      "name": "Enviar Mensagem",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [650, 300]
+    }
+  ]
+}

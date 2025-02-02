@@ -1,0 +1,16 @@
+{
+  "evolution_api": {
+    "base_url": "http://evolution-api:8080",
+    "endpoints": {
+      "create_group": "/group/create",
+      "send_message": "/message/send/text",
+      "add_participant": "/group/add-participant"
+    }
+  },
+  "supabase": {
+    "base_url": "https://qaslqmnbsgugvnmbtabg.supabase.co",
+    "endpoints": {
+      "rest": "/rest/v1"
+    }
+  }
+}

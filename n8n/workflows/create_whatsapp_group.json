@@ -1,0 +1,77 @@
+{
+  "name": "Criar Grupo WhatsApp",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "webhook/communities",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "url": "=http://evolution-api:8080/group/create",
+        "method": "POST",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $env.EVOLUTION_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "subject",
+              "value": "={{ $json.name }} - Grupo de Dominó"
+            },
+            {
+              "name": "description",
+              "value": "={{ $json.description }}"
+            }
+          ]
+        }
+      },
+      "name": "Criar Grupo",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "url": "=https://qaslqmnbsgugvnmbtabg.supabase.co/rest/v1/communities?id=eq.{{ $json.id }}",
+        "method": "PATCH",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $env.SUPABASE_ANON_KEY }}"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $env.SUPABASE_ANON_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "whatsapp_group_id",
+              "value": "={{ $json.groupId }}"
+            }
+          ]
+        }
+      },
+      "name": "Atualizar Comunidade",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [650, 300]
+    }
+  ]
+}
