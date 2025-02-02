@@ -1,16 +1,17 @@
 version: '3.8'
 
 services:
-  evolution-api:
-    image: atendai/evolution-api:v1.4.3
-    container_name: evolution-api
+  whatsapp-api:
+    build: ./whatsapp-api
+    container_name: whatsapp-api
     restart: always
     ports:
       - "8080:8080"
     environment:
-      - API_KEY=${EVOLUTION_API_KEY}
+      - API_KEY=domino-competitions-whatsapp-key-2025
+      - NODE_ENV=production
     volumes:
-      - evolution-api:/evolution/instances
+      - whatsapp-data:/app/.wwebjs_auth
     networks:
       - app-network
 
@@ -36,5 +37,5 @@ networks:
     driver: bridge
 
 volumes:
-  evolution-api:
+  whatsapp-data:
   n8n_data:
