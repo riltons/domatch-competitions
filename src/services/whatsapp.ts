@@ -1,8 +1,7 @@
 import { Community, Player } from '../types/supabase';
 
-const EVOLUTION_API_URL = import.meta.env.VITE_EVOLUTION_API_URL || 'http://localhost:8080';
-const EVOLUTION_API_KEY = import.meta.env.VITE_EVOLUTION_API_KEY;
-const N8N_WEBHOOK_URL = import.meta.env.VITE_N8N_WEBHOOK_URL || 'http://localhost:5678/webhook';
+const WHATSAPP_API_URL = import.meta.env.VITE_WHATSAPP_API_URL || 'http://localhost:8080';
+const WHATSAPP_API_KEY = import.meta.env.VITE_WHATSAPP_API_KEY;
 
 interface CreateGroupResponse {
   id: string;
@@ -18,17 +17,15 @@ interface SendInviteResponse {
 export const whatsappService = {
   async createCommunityGroup(community: Community): Promise<CreateGroupResponse> {
     try {
-      const response = await fetch(`${N8N_WEBHOOK_URL}/community/create`, {
+      const response = await fetch(`${WHATSAPP_API_URL}/group/create`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${EVOLUTION_API_KEY}`
+          'apikey': WHATSAPP_API_KEY
         },
         body: JSON.stringify({
-          communityId: community.id,
-          communityName: community.name,
-          adminPhone: community.admin_phone,
-          description: community.description
+          name: community.name,
+          participants: [community.admin_phone]
         })
       });
 
@@ -36,7 +33,12 @@ export const whatsappService = {
         throw new Error('Falha ao criar grupo no WhatsApp');
       }
 
-      return await response.json();
+      const data = await response.json();
+      return {
+        id: data.groupId,
+        inviteLink: data.inviteLink,
+        qrCode: data.qrCode
+      };
     } catch (error) {
       console.error('Erro ao criar grupo:', error);
       throw error;
@@ -45,27 +47,31 @@ export const whatsappService = {
 
   async sendPlayerInvite(community: Community, player: Player): Promise<SendInviteResponse> {
     try {
-      const response = await fetch(`${N8N_WEBHOOK_URL}/community/invite`, {
+      if (!community.whatsapp_group_invite_link) {
+        throw new Error('Link de convite do grupo não disponível');
+      }
+
+      const response = await fetch(`${WHATSAPP_API_URL}/message/send`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${EVOLUTION_API_KEY}`
+          'apikey': WHATSAPP_API_KEY
         },
         body: JSON.stringify({
-          communityId: community.id,
-          communityName: community.name,
-          playerId: player.id,
-          playerPhone: player.phone,
-          groupId: community.whatsapp_group_id,
-          inviteLink: community.whatsapp_group_invite_link
+          number: player.phone,
+          message: `Olá! Você foi convidado para participar da comunidade "${community.name}" no Domino Competitions.\n\nClique no link abaixo para entrar no grupo do WhatsApp:\n${community.whatsapp_group_invite_link}`
         })
       });
 
       if (!response.ok) {
-        throw new Error('Falha ao enviar convite via WhatsApp');
+        throw new Error('Falha ao enviar convite');
       }
 
-      return await response.json();
+      const data = await response.json();
+      return {
+        messageId: data.messageId,
+        status: data.success ? 'sent' : 'failed'
+      };
     } catch (error) {
       console.error('Erro ao enviar convite:', error);
       throw error;

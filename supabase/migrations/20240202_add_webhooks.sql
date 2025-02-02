@@ -1,14 +1,16 @@
+-- Enable http extension if not already enabled
+CREATE EXTENSION IF NOT EXISTS "http";
+
 -- Create function to notify webhook
 CREATE OR REPLACE FUNCTION notify_webhook()
 RETURNS trigger AS $$
 BEGIN
   -- Make HTTP request to n8n webhook
   PERFORM
-    net.http_post(
-      'http://n8n:5678/webhook/' || TG_TABLE_NAME,  -- URL do webhook
+    http_post(
+      'http://localhost:5678/webhook/' || TG_TABLE_NAME,  -- URL do webhook
       CAST(row_to_json(NEW) as text),               -- Corpo da requisição
-      '{}'::jsonb,                                  -- Headers
-      0                                             -- Timeout
+      'application/json'                            -- Content type
     );
   RETURN NEW;
 END;
