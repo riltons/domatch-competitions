@@ -1,72 +1,44 @@
 import { Database } from './supabase'
 
-export type Community = Database['public']['Tables']['communities']['Row']
-export type Competition = Database['public']['Tables']['competitions']['Row']
+export type Tables = Database['public']['Tables']
 
-export interface CreateCommunityDTO {
+export type Player = Tables['players']['Row']
+export type Community = Tables['communities']['Row']
+export type CommunityMember = Tables['community_members']['Row']
+export type Competition = Tables['competitions']['Row']
+export type Game = Tables['games']['Row']
+
+export type CreateCommunityDTO = {
   name: string
+  description?: string
 }
 
-export interface CreateCompetitionDTO {
+export type CreateCompetitionDTO = {
   name: string
   startDate: Date
-  endDate: Date
+  endDate?: Date
   communityId: string
 }
 
-export interface UpdateCommunityDTO extends Partial<CreateCommunityDTO> {
+export type UpdateCommunityDTO = {
   id: string
+  name?: string
+  description?: string
 }
 
-export interface UpdateCompetitionDTO extends Partial<CreateCompetitionDTO> {
+export type UpdateCompetitionDTO = {
   id: string
+  name?: string
+  startDate?: Date
+  endDate?: Date
+  status?: 'draft' | 'active' | 'finished'
 }
 
-export interface Usuario {
-  id: string
-  email: string
-  nome: string
-  papel: 'admin' | 'organizador'
-  telefone: string
-  created_at: string
-}
-
-export interface Comunidade {
-  id: string
-  nome: string
-  descricao: string
-  admin_id: string
-  grupo_whatsapp_id: string
-  created_at: string
-}
-
-export interface Competicao {
-  id: string
-  nome: string
-  comunidade_id: string
-  data_inicio: string
-  data_fim: string | null
-  status: 'pendente' | 'ativa' | 'encerrada'
-  created_at: string
-}
-
-export interface Jogador {
-  id: string
-  nome: string
-  apelido: string | null
-  telefone: string
-  created_at: string
-}
-
-export interface Partida {
-  id: string
-  competicao_id: string
-  data: string
-  dupla1_jogador1_id: string
-  dupla1_jogador2_id: string
-  dupla2_jogador1_id: string
-  dupla2_jogador2_id: string
-  pontos_dupla1: number
-  pontos_dupla2: number
-  created_at: string
+export type CreateGameDTO = {
+  competitionId: string
+  team1Player1Id: string
+  team1Player2Id: string
+  team2Player1Id: string
+  team2Player2Id: string
+  date: Date
 }

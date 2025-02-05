@@ -1,35 +1,171 @@
-export interface Community {
-  id: string;
-  name: string;
-  description?: string;
-  created_at: string;
-  created_by: string;
-  whatsapp_group_id?: string;
-  admin_phone?: string;
-  whatsapp_group_invite_link?: string;
-  whatsapp_group_qr_code?: string;
-}
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
 
-export interface Player {
-  id: string;
-  name: string;
-  email?: string;
-  phone?: string;
-  created_at: string;
-  created_by: string;
-  whatsapp_id?: string;
+export interface Database {
+  public: {
+    Tables: {
+      communities: {
+        Row: {
+          id: string
+          created_at: string
+          name: string
+          description: string | null
+          owner_id: string
+        }
+        Insert: {
+          id?: string
+          created_at?: string
+          name: string
+          description?: string | null
+          owner_id: string
+        }
+        Update: {
+          id?: string
+          created_at?: string
+          name?: string
+          description?: string | null
+          owner_id?: string
+        }
+      }
+      community_members: {
+        Row: {
+          id: string
+          created_at: string
+          community_id: string
+          player_id: string
+          role: 'admin' | 'member'
+        }
+        Insert: {
+          id?: string
+          created_at?: string
+          community_id: string
+          player_id: string
+          role?: 'admin' | 'member'
+        }
+        Update: {
+          id?: string
+          created_at?: string
+          community_id?: string
+          player_id?: string
+          role?: 'admin' | 'member'
+        }
+      }
+      players: {
+        Row: {
+          id: string
+          created_at: string
+          name: string
+          nickname: string | null
+          phone: string | null
+          user_id: string | null
+          avatar_url: string | null
+        }
+        Insert: {
+          id?: string
+          created_at?: string
+          name: string
+          nickname?: string | null
+          phone?: string | null
+          user_id?: string | null
+          avatar_url?: string | null
+        }
+        Update: {
+          id?: string
+          created_at?: string
+          name?: string
+          nickname?: string | null
+          phone?: string | null
+          user_id?: string | null
+          avatar_url?: string | null
+        }
+      }
+      competitions: {
+        Row: {
+          id: string
+          created_at: string
+          name: string
+          description: string | null
+          community_id: string
+          start_date: string
+          end_date: string | null
+          status: 'draft' | 'active' | 'finished'
+        }
+        Insert: {
+          id?: string
+          created_at?: string
+          name: string
+          description?: string | null
+          community_id: string
+          start_date: string
+          end_date?: string | null
+          status?: 'draft' | 'active' | 'finished'
+        }
+        Update: {
+          id?: string
+          created_at?: string
+          name?: string
+          description?: string | null
+          community_id?: string
+          start_date?: string
+          end_date?: string | null
+          status?: 'draft' | 'active' | 'finished'
+        }
+      }
+      games: {
+        Row: {
+          id: string
+          created_at: string
+          competition_id: string
+          team1_player1_id: string
+          team1_player2_id: string
+          team2_player1_id: string
+          team2_player2_id: string
+          team1_score: number
+          team2_score: number
+          status: 'scheduled' | 'in_progress' | 'finished'
+          date: string
+        }
+        Insert: {
+          id?: string
+          created_at?: string
+          competition_id: string
+          team1_player1_id: string
+          team1_player2_id: string
+          team2_player1_id: string
+          team2_player2_id: string
+          team1_score?: number
+          team2_score?: number
+          status?: 'scheduled' | 'in_progress' | 'finished'
+          date: string
+        }
+        Update: {
+          id?: string
+          created_at?: string
+          competition_id?: string
+          team1_player1_id?: string
+          team1_player2_id?: string
+          team2_player1_id?: string
+          team2_player2_id?: string
+          team1_score?: number
+          team2_score?: number
+          status?: 'scheduled' | 'in_progress' | 'finished'
+          date?: string
+        }
+      }
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      [_ in never]: never
+    }
+    Enums: {
+      [_ in never]: never
+    }
+  }
 }
-
-export interface CommunityPlayer {
-  id: string;
-  community_id: string;
-  player_id: string;
-  created_at: string;
-  invitation_status: 'pending' | 'accepted' | 'rejected';
-  player_phone?: string;
-  whatsapp_status?: 'pending' | 'accepted' | 'rejected';
-}
-
-export type CommunityInsert = Omit<Community, 'id' | 'created_at'>;
-export type PlayerInsert = Omit<Player, 'id' | 'created_at'>;
-export type CommunityPlayerInsert = Omit<CommunityPlayer, 'id' | 'created_at'>;

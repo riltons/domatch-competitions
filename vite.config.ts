@@ -79,5 +79,8 @@ export default defineConfig({
         }
       }
     }
+  },
+  paths: {
+    // Add your path configurations here
   }
 })

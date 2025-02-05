@@ -1,151 +1,32 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import { useAuth } from '@/features/auth/AuthProvider'
-import { MainLayout } from '@/components/layouts/MainLayout'
-import { HomePage } from '@/pages/HomePage'
-import { ProfilePage } from '@/pages/ProfilePage'
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { AuthProvider } from '@/features/auth/AuthProvider'
 import { LoginPage } from '@/features/auth/LoginPage'
-import { RegisterPage } from '@/features/auth/RegisterPage'
+import { HomePage } from '@/pages/Home'
 import { CommunitiesPage } from '@/pages/CommunitiesPage'
-import { NewCommunityPage } from '@/pages/NewCommunityPage'
-import { PlayersPage } from '@/pages/PlayersPage'
-import { AllPlayersPage } from '@/pages/AllPlayersPage'
-import { NewPlayerPage } from '@/pages/NewPlayerPage'
-import { EditPlayerPage } from '@/pages/EditPlayerPage'
-import { ManageCommunityPage } from '@/pages/ManageCommunityPage'
-import { EditCommunityPage } from '@/pages/EditCommunityPage'
 import { CommunityPlayersPage } from '@/pages/CommunityPlayersPage'
-import { Toaster } from 'sonner'
+import { AllPlayersPage } from '@/pages/AllPlayersPage'
+import { EditPlayerPage } from '@/pages/EditPlayerPage'
 
-function PublicRoute({ children }: { children: React.ReactNode }) {
-  const { user, loading } = useAuth()
+const queryClient = new QueryClient()
 
-  if (loading) {
-    return null
-  }
-
-  if (user) {
-    return <Navigate to="/" />
-  }
-
-  return children
-}
-
-function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { user, loading } = useAuth()
-
-  if (loading) {
-    return null
-  }
-
-  if (!user) {
-    return <Navigate to="/login" />
-  }
-
-  return <MainLayout>{children}</MainLayout>
-}
-
-export function App() {
+function App() {
   return (
-    <BrowserRouter>
-      <Toaster richColors position="top-right" />
-      <Routes>
-        <Route
-          path="/login"
-          element={
-            <PublicRoute>
-              <LoginPage />
-            </PublicRoute>
-          }
-        />
-        <Route
-          path="/register"
-          element={
-            <PublicRoute>
-              <RegisterPage />
-            </PublicRoute>
-          }
-        />
-        <Route
-          path="/"
-          element={
-            <ProtectedRoute>
-              <HomePage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/profile"
-          element={
-            <ProtectedRoute>
-              <ProfilePage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/communities"
-          element={
-            <ProtectedRoute>
-              <CommunitiesPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/communities/new"
-          element={
-            <ProtectedRoute>
-              <NewCommunityPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/communities/:id/players"
-          element={
-            <ProtectedRoute>
-              <CommunityPlayersPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/communities/:id/manage"
-          element={
-            <ProtectedRoute>
-              <ManageCommunityPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/communities/:id/edit"
-          element={
-            <ProtectedRoute>
-              <EditCommunityPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/players"
-          element={
-            <ProtectedRoute>
-              <AllPlayersPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/players/new"
-          element={
-            <ProtectedRoute>
-              <NewPlayerPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/players/:id/edit"
-          element={
-            <ProtectedRoute>
-              <EditPlayerPage />
-            </ProtectedRoute>
-          }
-        />
-      </Routes>
-    </BrowserRouter>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <AuthProvider>
+          <Routes>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/" element={<HomePage />} />
+            <Route path="/communities" element={<CommunitiesPage />} />
+            <Route path="/communities/:id/players" element={<CommunityPlayersPage />} />
+            <Route path="/players" element={<AllPlayersPage />} />
+            <Route path="/players/:id/edit" element={<EditPlayerPage />} />
+          </Routes>
+        </AuthProvider>
+      </BrowserRouter>
+    </QueryClientProvider>
   )
 }
+
+export default App
